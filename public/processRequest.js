@@ -300,10 +300,20 @@ module.exports = function processRequest(
         capacitor.destroy(exitError);
       });
 
+      var lengthDownloaded = 0;
+      stream.on('data', (chunk) => {
+        lengthDownloaded += chunk.length;
+      })
+
+      stream.on('end', () => {
+        file.length = lengthDownloaded
+      })
+
       const file = {
         filename,
         mimetype,
         encoding,
+        length: null,
         createReadStream(options) {
           const error = fileError || (released ? exitError : null);
           if (error) throw error;
